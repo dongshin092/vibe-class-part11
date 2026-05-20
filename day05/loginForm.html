@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+
+        body{
+            padding: 0;
+            margin: 0;
+        }
+         .caontainer{
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+         }
+
+         .login-form{
+            width: 400px;
+            height: 350px;
+            border: 1px solid black;
+            border-radius: 5px;
+         }
+
+         .form{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+         }
+
+         .title{
+            text-align: center;
+         }
+
+         .loginBtn{
+            width: 100%;
+            background-color: #0f3eca;
+            border-radius: 10px;
+            color: white;
+         }
+    </style>
+</head>
+<body>
+    <div class="caontainer">
+        <div class="login-form">
+            <div class="form">
+                <form>
+                   <span class="title"><h2>로그인</h2></span>
+                   <div>
+                      <input type="text"  id="userId" placeholder="ID 입력 ">
+                   </div>
+                   <div>
+                      <input type="password"  id="passwd"  placeholder="PASSWORD 입력 ">
+                   </div>
+                   <div>
+                    <button type="button"  class="loginBtn" onclick="login();">로그인</button>
+                   </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script>
+
+        function login() {
+            // html 값을 -> 자바스크립트로 가져올 수 있음
+            // 자바스크립트의 결과 값 -> html 영역에 적용 가능 
+
+            //html 영역을  자바스크립트에서는 docuemnt 라는 객체를 사용 
+            const userId = document.getElementById('userId');
+            const passwd = document.getElementById('passwd');
+
+            if(userId.value.trim().length === 0) {
+                alert('아이디를 입력하십시오.');
+                //함수끝내기
+                return;
+            }
+
+
+             if(passwd.value.trim().length === 0) {
+                alert('패스워드를 입력하십시오.');
+                //함수끝내기
+                return;
+            }
+
+            alert('로그인 되었습니다.');
+
+        }
+
+    </script>
+</body>
+</html>

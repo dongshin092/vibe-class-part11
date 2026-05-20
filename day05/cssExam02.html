@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+
+        div {
+            border: 1px solid black;
+        }
+
+        .outline{
+            width: 100px;
+            height: 100px;
+        }
+        .child{
+            width: 50%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="outline">
+        <!-- 부모 div 의 width, height 대비 % 적용  -->
+        <div class="child">자식</div>
+    </div>
+    <!-- height 영역이 이미 100% 라서 커지지 않는다. -->
+    <div class="child">외부</div>
+
+</body>
+</html>

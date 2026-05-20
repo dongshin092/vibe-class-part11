@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <!--
+   CSS 를 사용하는 방법은 3가지
+   1. <style>...</style> 영역 부여 
+   2. html tag 에 직접 적용(..실제로 안함)
+   3. css 파일을 만든 뒤 링크 
+-->
+   <style>
+       /*
+         CSS는 선택자를  생성하고, 내용을 입력합니다.
+         선택자에는  
+            html tag   (html 태그 전체 적용)
+            tag id     (id 를 가진 태그에 적용, id 앞에 #을 붙임)
+            className  (class이름이 적용된 태그에 적용. 이름앞에 닷(.)을 붙임  )
+            tag 속성   (속성이 부합하는 태그에 적용 )
+       */
+
+       div {
+         width: 500px;
+         height: 200px;
+         background-color: blue;
+         border : 1px solid red  /*두께 선모양 색깔*/
+       }
+
+       #div2 {
+          background-color: brown;
+       }
+
+       .pink {
+        background-color: pink;
+       }
+
+       /*태그[속성명='value']*/
+       input[name='userId'] {
+         height: 90px;
+       }
+
+   </style>
+</head>
+
+
+<body>
+    <div>div1</div>
+    <div id="div2">div2</div>
+    <div>div3</div>
+    <div class="pink">div4</div>
+    <div class="pink">div5</div>
+    <div >
+        <input type="text"      name="userId"   placeholder="아이디입력">
+        <input type="password"  name="password" placeholder="비밀번호 입력 ">
+    </div>
+</body>
+</html>
