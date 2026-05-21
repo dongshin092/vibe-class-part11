@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div>
+        <input type="number" id="score" placeholder="점수를 입력">
+    </div>
+    <div>
+        <button type="button" onclick="getResult();">확인</button>
+    </div>
+    <script>
+
+        function getResult() {
+
+             //선택자를 사용해서 html 값을 가져오기 
+            // 선택자는 css 와 동일 (id: #, class명은 . ...)
+            const score = document.querySelector('#score');
+
+            if(score.value.trim().length === 0) {
+                alert('값을 입력하세요.');
+                return; // 함수 종료 
+            }
+
+            
+            if(score.value >= 65) {
+                alert('합격입니다.');
+            }else {
+                alert('불합격입니다.');
+            }
+        }
+
+    </script>
+</body>
+</html>
