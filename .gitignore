@@ -10,3 +10,6 @@ target/
 .project
 .classpath
 .settings
+
+#환경설정파일
+.env
