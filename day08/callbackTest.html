@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+</body>
+<script>
+
+    const arr = [1,2,3,4,5, 10, 12, 11, 30, 31, 44, 45];
+
+    //다른함수에 매개변수로 전달되는 함수 > 콜백함수
+    //매개변수로 전달될수 있는 함수? >> 그냥 함수면 전달됨 
+    function loop(back){
+        for(i = 0; i < arr.length; i ++) {
+            back(i, arr[i]);
+        }
+    }
+
+
+
+    loop( 
+
+         (index, value) => {
+            if( value % 2 == 0){ 
+                console.log(value);
+            }
+        }
+   );
+
+</script>
+</html>
