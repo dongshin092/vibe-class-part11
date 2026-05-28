@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🎱 로또 번호 추천</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #1a1a2e;
+      color: #eee;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 24px 12px;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 520px;
+      background: #16213e;
+      border-radius: 20px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+      overflow: hidden;
+    }
+
+    /* Header */
+    .header {
+      background: linear-gradient(135deg, #0f3460, #533483);
+      padding: 24px 20px 16px;
+      text-align: center;
+    }
+    .header h1 { font-size: 1.6rem; font-weight: 800; letter-spacing: 1px; }
+    .header p { font-size: 0.78rem; color: #aac4ff; margin-top: 4px; }
+
+    /* Mode Tabs */
+    .tabs {
+      display: flex;
+      border-bottom: 2px solid #0f3460;
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 12px 0;
+      background: none;
+      border: none;
+      color: #7a8abb;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .tab-btn.active {
+      color: #fff;
+      background: #0f3460;
+      border-bottom: 2px solid #e94560;
+    }
+    .tab-btn:hover:not(.active) { background: #1e2d50; color: #ccd; }
+
+    /* Number Grid */
+    .grid-section { padding: 16px 16px 8px; }
+    .grid-label {
+      font-size: 0.78rem;
+      color: #7a8abb;
+      margin-bottom: 8px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .number-grid {
+      display: grid;
+      grid-template-columns: repeat(9, 1fr);
+      gap: 6px;
+    }
+    .num-cell {
+      aspect-ratio: 1;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all 0.15s;
+      user-select: none;
+      background: #1e2d50;
+      color: #ccd;
+    }
+    .num-cell:hover { transform: scale(1.1); }
+
+    /* Ball colors by range */
+    .num-cell.default { background: #1e2d50; color: #ccd; border-color: #2a3f6e; }
+    .num-cell.pinned  { border-color: transparent; color: #000; font-weight: 800; }
+    .num-cell.excluded {
+      background: #2a2a2a !important;
+      color: #555 !important;
+      border-color: #333 !important;
+      text-decoration: line-through;
+      opacity: 0.5;
+    }
+
+    /* pin ring */
+    .num-cell.pinned::after {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      border: 2px solid #fff;
+      pointer-events: none;
+    }
+    .num-cell { position: relative; }
+
+    /* Tag lists */
+    .tag-section { padding: 8px 16px; }
+    .tag-row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 8px;
+      min-height: 32px;
+    }
+    .tag-row-label {
+      font-size: 0.72rem;
+      color: #7a8abb;
+      font-weight: 700;
+      min-width: 36px;
+    }
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #000;
+    }
+    .tag-pin { background: #ffd600; }
+    .tag-exc { background: #888; color: #fff; }
+    .tag button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 0.7rem;
+      line-height: 1;
+      color: inherit;
+      opacity: 0.7;
+    }
+    .tag button:hover { opacity: 1; }
+    .clear-btn {
+      font-size: 0.7rem;
+      padding: 3px 8px;
+      border: 1px solid #3a4b70;
+      border-radius: 12px;
+      background: none;
+      color: #7a8abb;
+      cursor: pointer;
+    }
+    .clear-btn:hover { background: #1e2d50; color: #ccd; }
+
+    /* Generate Button */
+    .gen-section { padding: 12px 16px; }
+    .gen-btn {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #e94560, #c71f6b);
+      color: #fff;
+      font-size: 1.05rem;
+      font-weight: 800;
+      cursor: pointer;
+      letter-spacing: 1px;
+      transition: transform 0.15s, box-shadow 0.15s;
+      box-shadow: 0 4px 16px rgba(233,69,96,0.4);
+    }
+    .gen-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(233,69,96,0.6); }
+    .gen-btn:active { transform: translateY(0); }
+
+    /* Result */
+    .result-section { padding: 0 16px 12px; }
+    .result-box {
+      background: #0f1e3a;
+      border-radius: 14px;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      min-height: 72px;
+    }
+    .result-balls { display: flex; gap: 8px; flex-wrap: wrap; }
+    .ball {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: #fff;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+      box-shadow: inset 0 -3px 6px rgba(0,0,0,0.3), 0 2px 6px rgba(0,0,0,0.3);
+      animation: pop 0.3s ease;
+    }
+    @keyframes pop {
+      0% { transform: scale(0.5); opacity: 0; }
+      70% { transform: scale(1.15); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .copy-btn {
+      padding: 8px 14px;
+      border: 1px solid #3a4b70;
+      border-radius: 10px;
+      background: none;
+      color: #aac4ff;
+      font-size: 0.8rem;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .copy-btn:hover { background: #1e2d50; }
+
+    .result-placeholder {
+      color: #3a4b70;
+      font-size: 0.9rem;
+      text-align: center;
+      width: 100%;
+    }
+
+    /* History */
+    .history-section { padding: 0 16px 16px; }
+    .history-label {
+      font-size: 0.72rem;
+      color: #7a8abb;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+    .history-list { display: flex; flex-direction: column; gap: 6px; }
+    .history-item {
+      background: #0f1e3a;
+      border-radius: 10px;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      justify-content: space-between;
+    }
+    .history-idx {
+      font-size: 0.68rem;
+      color: #3a4b70;
+      min-width: 16px;
+    }
+    .history-balls { display: flex; gap: 5px; }
+    .history-ball {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.65rem;
+      font-weight: 800;
+      color: #fff;
+      text-shadow: 0 1px 1px rgba(0,0,0,0.4);
+    }
+    .history-mode {
+      font-size: 0.65rem;
+      color: #3a4b70;
+    }
+
+    /* Reset */
+    .reset-section { padding: 4px 16px 20px; text-align: center; }
+    .reset-btn {
+      background: none;
+      border: 1px solid #2a3f6e;
+      color: #7a8abb;
+      padding: 8px 24px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 0.82rem;
+    }
+    .reset-btn:hover { background: #1e2d50; color: #ccd; }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%) translateY(60px);
+      background: #e94560;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 24px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      transition: transform 0.3s, opacity 0.3s;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 999;
+      white-space: nowrap;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+    /* Manual mode hint */
+    .manual-hint {
+      font-size: 0.72rem;
+      color: #7a8abb;
+      text-align: center;
+      padding: 4px 0 8px;
+    }
+
+    /* Divider */
+    .divider { height: 1px; background: #1e2d50; margin: 0 16px; }
+
+    @media (max-width: 375px) {
+      .number-grid { gap: 4px; }
+      .num-cell { font-size: 0.65rem; }
+      .ball { width: 38px; height: 38px; font-size: 0.8rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app">
+  <div class="header">
+    <h1>🎱 로또 번호 추천</h1>
+    <p>1~45 중 6개 · 공식 볼 색상 적용</p>
+  </div>
+
+  <!-- Mode Tabs -->
+  <div class="tabs">
+    <button class="tab-btn active" data-mode="auto">🎲 자동</button>
+    <button class="tab-btn" data-mode="semi">🔒 반자동</button>
+    <button class="tab-btn" data-mode="manual">✏️ 수동</button>
+  </div>
+
+  <!-- Number Grid -->
+  <div class="grid-section" id="grid-section" style="display:none;">
+    <div class="grid-label" id="grid-label">번호판 — 클릭: 기본 → 고정 → 제외</div>
+    <div class="number-grid" id="number-grid"></div>
+    <div class="manual-hint" id="manual-hint" style="display:none;">6개를 직접 선택하세요 (<span id="manual-count">0</span>/6)</div>
+  </div>
+
+  <div class="divider" id="grid-divider" style="display:none;"></div>
+
+  <!-- Tags -->
+  <div class="tag-section">
+    <div class="tag-row">
+      <span class="tag-row-label">🔒 고정</span>
+      <span id="pinned-tags"></span>
+      <button class="clear-btn" id="clear-pinned">전체해제</button>
+    </div>
+    <div class="tag-row">
+      <span class="tag-row-label">❌ 제외</span>
+      <span id="excluded-tags"></span>
+      <button class="clear-btn" id="clear-excluded">전체해제</button>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Generate -->
+  <div class="gen-section">
+    <button class="gen-btn" id="gen-btn">🎲 추천 번호 생성</button>
+  </div>
+
+  <!-- Result -->
+  <div class="result-section">
+    <div class="result-box" id="result-box">
+      <span class="result-placeholder">추천 번호가 여기에 표시됩니다</span>
+    </div>
+  </div>
+
+  <!-- History -->
+  <div class="history-section" id="history-section" style="display:none;">
+    <div class="history-label">최근 추천 이력</div>
+    <div class="history-list" id="history-list"></div>
+  </div>
+
+  <!-- Reset -->
+  <div class="reset-section">
+    <button class="reset-btn" id="reset-btn">🔄 전체 초기화</button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+  // ── State ──────────────────────────────────────────────
+  const state = {
+    mode: 'auto',
+    cellState: new Array(46).fill('default'), // 1-indexed, index 0 unused
+    history: []
+  };
+
+  // ── Ball color helper ──────────────────────────────────
+  function ballColor(n) {
+    if (n <= 9)  return '#FBC400';
+    if (n <= 19) return '#069CE7';
+    if (n <= 29) return '#FF7272';
+    if (n <= 39) return '#AAAAAA';
+    return '#B0D840';
+  }
+
+  // ── Build Grid ─────────────────────────────────────────
+  const grid = document.getElementById('number-grid');
+
+  for (let n = 1; n <= 45; n++) {
+    const cell = document.createElement('div');
+    cell.className = 'num-cell default';
+    cell.textContent = n;
+    cell.dataset.n = n;
+    cell.addEventListener('click', () => onCellClick(n));
+    grid.appendChild(cell);
+  }
+
+  function getCells() {
+    return [...grid.querySelectorAll('.num-cell')];
+  }
+
+  function getCell(n) {
+    return grid.querySelector(`.num-cell[data-n="${n}"]`);
+  }
+
+  // ── Cell click handler ─────────────────────────────────
+  function onCellClick(n) {
+    const mode = state.mode;
+
+    if (mode === 'manual') {
+      const cur = state.cellState[n];
+      // In manual mode: only toggle 'selected' (reuse pinned slot visually)
+      if (cur === 'manual') {
+        state.cellState[n] = 'default';
+      } else if (cur === 'default') {
+        const selectedCount = state.cellState.filter(s => s === 'manual').length;
+        if (selectedCount >= 6) { showToast('최대 6개까지 선택 가능합니다'); return; }
+        state.cellState[n] = 'manual';
+      }
+      // excluded cells can't be selected in manual mode
+      renderGrid();
+      renderTags();
+      updateManualCount();
+      return;
+    }
+
+    // auto / semi mode: cycle default → pinned → excluded → default
+    const cur = state.cellState[n];
+    if (cur === 'default') {
+      const pinnedCount = state.cellState.filter(s => s === 'pinned').length;
+      if (pinnedCount >= 6) {
+        showToast('고정 번호는 최대 6개까지 설정할 수 있습니다');
+        // skip to excluded instead
+        state.cellState[n] = 'excluded';
+      } else {
+        state.cellState[n] = 'pinned';
+      }
+    } else if (cur === 'pinned') {
+      state.cellState[n] = 'excluded';
+    } else if (cur === 'excluded') {
+      state.cellState[n] = 'default';
+    }
+
+    renderGrid();
+    renderTags();
+  }
+
+  // ── Render Grid ────────────────────────────────────────
+  function renderGrid() {
+    for (let n = 1; n <= 45; n++) {
+      const cell = getCell(n);
+      const s = state.cellState[n];
+      cell.className = 'num-cell';
+
+      if (s === 'excluded') {
+        cell.classList.add('excluded');
+      } else if (s === 'pinned') {
+        cell.classList.add('pinned');
+        cell.style.background = ballColor(n);
+        cell.style.color = '#000';
+      } else if (s === 'manual') {
+        cell.classList.add('pinned');
+        cell.style.background = ballColor(n);
+        cell.style.color = '#000';
+      } else {
+        cell.classList.add('default');
+        cell.style.background = '';
+        cell.style.color = '';
+      }
+    }
+  }
+
+  // ── Render Tags ────────────────────────────────────────
+  function renderTags() {
+    const pinnedNums = [];
+    const excludedNums = [];
+    for (let n = 1; n <= 45; n++) {
+      if (state.cellState[n] === 'pinned') pinnedNums.push(n);
+      if (state.cellState[n] === 'excluded') excludedNums.push(n);
+    }
+
+    const pt = document.getElementById('pinned-tags');
+    pt.innerHTML = pinnedNums.map(n =>
+      `<span class="tag tag-pin">${n}<button onclick="removePin(${n})">✕</button></span>`
+    ).join('');
+
+    const et = document.getElementById('excluded-tags');
+    et.innerHTML = excludedNums.map(n =>
+      `<span class="tag tag-exc">${n}<button onclick="removeExc(${n})">✕</button></span>`
+    ).join('');
+  }
+
+  function removePin(n) {
+    state.cellState[n] = 'default';
+    renderGrid(); renderTags();
+  }
+
+  function removeExc(n) {
+    state.cellState[n] = 'default';
+    renderGrid(); renderTags();
+  }
+
+  document.getElementById('clear-pinned').addEventListener('click', () => {
+    for (let n = 1; n <= 45; n++) if (state.cellState[n] === 'pinned') state.cellState[n] = 'default';
+    renderGrid(); renderTags();
+  });
+
+  document.getElementById('clear-excluded').addEventListener('click', () => {
+    for (let n = 1; n <= 45; n++) if (state.cellState[n] === 'excluded') state.cellState[n] = 'default';
+    renderGrid(); renderTags();
+  });
+
+  // ── Mode Tabs ──────────────────────────────────────────
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const newMode = btn.dataset.mode;
+
+      // clear manual selections when leaving manual mode
+      if (state.mode === 'manual') {
+        for (let n = 1; n <= 45; n++) if (state.cellState[n] === 'manual') state.cellState[n] = 'default';
+      }
+
+      state.mode = newMode;
+
+      const hint = document.getElementById('manual-hint');
+      const label = document.getElementById('grid-label');
+      const gridSection = document.getElementById('grid-section');
+      const gridDivider = document.getElementById('grid-divider');
+
+      if (newMode === 'auto') {
+        gridSection.style.display = 'none';
+        gridDivider.style.display = 'none';
+        hint.style.display = 'none';
+      } else if (newMode === 'manual') {
+        gridSection.style.display = 'block';
+        gridDivider.style.display = 'block';
+        hint.style.display = 'block';
+        label.textContent = '번호판 — 6개를 직접 선택하세요';
+        updateManualCount();
+      } else {
+        gridSection.style.display = 'block';
+        gridDivider.style.display = 'block';
+        hint.style.display = 'none';
+        label.textContent = '번호판 — 고정 번호를 선택하세요';
+      }
+
+      renderGrid(); renderTags();
+    });
+  });
+
+  function updateManualCount() {
+    const cnt = state.cellState.filter(s => s === 'manual').length;
+    document.getElementById('manual-count').textContent = cnt;
+  }
+
+  // ── Fisher-Yates shuffle ───────────────────────────────
+  function shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  // ── Generate ───────────────────────────────────────────
+  function generate() {
+    const pinned = new Set();
+    const excluded = new Set();
+    for (let n = 1; n <= 45; n++) {
+      if (state.cellState[n] === 'pinned') pinned.add(n);
+      if (state.cellState[n] === 'excluded') excluded.add(n);
+    }
+
+    if (excluded.size >= 40) {
+      showToast('최소 6개 번호가 필요합니다. 제외 번호를 줄여주세요'); return null;
+    }
+
+    const pool = Array.from({length: 45}, (_, i) => i + 1)
+      .filter(n => !excluded.has(n) && !pinned.has(n));
+    const need = 6 - pinned.size;
+
+    if (pool.length < need) {
+      showToast('가능한 번호가 부족합니다. 제외 번호를 줄여주세요'); return null;
+    }
+
+    const picked = shuffle(pool).slice(0, need);
+    return [...pinned, ...picked].sort((a, b) => a - b);
+  }
+
+  // ── Generate button ────────────────────────────────────
+  document.getElementById('gen-btn').addEventListener('click', () => {
+    let result;
+
+    if (state.mode === 'manual') {
+      const sel = [];
+      for (let n = 1; n <= 45; n++) if (state.cellState[n] === 'manual') sel.push(n);
+      if (sel.length !== 6) { showToast(`6개를 선택해주세요 (현재 ${sel.length}개)`); return; }
+      result = sel.sort((a, b) => a - b);
+    } else {
+      result = generate();
+      if (!result) return;
+    }
+
+    renderResult(result);
+    addHistory(result, state.mode);
+  });
+
+  // ── Render Result ──────────────────────────────────────
+  function renderResult(nums) {
+    const box = document.getElementById('result-box');
+    const ballsHtml = nums.map((n, i) =>
+      `<div class="ball" style="background:${ballColor(n)};animation-delay:${i * 0.07}s">${n}</div>`
+    ).join('');
+
+    box.innerHTML = `
+      <div class="result-balls">${ballsHtml}</div>
+      <button class="copy-btn" id="copy-btn">📋 복사</button>
+    `;
+
+    document.getElementById('copy-btn').addEventListener('click', () => {
+      navigator.clipboard.writeText(nums.join(', ')).then(() => {
+        showToast('클립보드에 복사되었습니다!');
+      }).catch(() => {
+        // fallback
+        const ta = document.createElement('textarea');
+        ta.value = nums.join(', ');
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        showToast('클립보드에 복사되었습니다!');
+      });
+    });
+  }
+
+  // ── History ────────────────────────────────────────────
+  const modeLabel = { auto: '자동', semi: '반자동', manual: '수동' };
+
+  function addHistory(nums, mode) {
+    state.history.unshift({ nums, mode });
+    if (state.history.length > 5) state.history.pop();
+    renderHistory();
+  }
+
+  function renderHistory() {
+    const section = document.getElementById('history-section');
+    const list = document.getElementById('history-list');
+    if (state.history.length === 0) { section.style.display = 'none'; return; }
+    section.style.display = 'block';
+
+    list.innerHTML = state.history.map((item, idx) => {
+      const balls = item.nums.map(n =>
+        `<div class="history-ball" style="background:${ballColor(n)}">${n}</div>`
+      ).join('');
+      return `
+        <div class="history-item">
+          <span class="history-idx">${idx + 1}</span>
+          <div class="history-balls">${balls}</div>
+          <span class="history-mode">${modeLabel[item.mode]}</span>
+        </div>`;
+    }).join('');
+  }
+
+  // ── Reset ──────────────────────────────────────────────
+  document.getElementById('reset-btn').addEventListener('click', () => {
+    state.cellState.fill('default');
+    state.history = [];
+    state.mode = 'auto';
+
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector('.tab-btn[data-mode="auto"]').classList.add('active');
+    document.getElementById('manual-hint').style.display = 'none';
+    document.getElementById('grid-section').style.display = 'none';
+    document.getElementById('grid-divider').style.display = 'none';
+    document.getElementById('grid-label').textContent = '번호판 — 클릭: 기본 → 고정 → 제외';
+    document.getElementById('result-box').innerHTML = '<span class="result-placeholder">추천 번호가 여기에 표시됩니다</span>';
+    document.getElementById('history-section').style.display = 'none';
+
+    renderGrid(); renderTags();
+    showToast('초기화되었습니다');
+  });
+
+  // ── Toast ──────────────────────────────────────────────
+  let toastTimer;
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+  }
+
+  // ── Init ───────────────────────────────────────────────
+  renderGrid();
+  renderTags();
+</script>
+</body>
+</html>

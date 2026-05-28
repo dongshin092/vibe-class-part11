@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .container {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+            align-content: flex-start;
+            width: 800px;
+            height: 600px;
+            border: 1px solid black;
+            gap : 10px;
+            overflow: auto; /*영역을 넘치면 스크롤 생김 */
+        }
+
+        .box {
+            width: 100px;
+            height: 100px;
+            border: 1px solid black;
+        }
+
+        .buttonArea{
+            text-align: center;
+            margin-top: 10px;
+            width: 800px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container"></div>
+    <div class="buttonArea">
+        <button type="button" onclick="makeBox();">생성</button>
+        <button type="button" onclick="deleteBox();">삭제</button>
+    </div>
+    <script>
+
+        const conatainer = document.querySelector('.conatainer');
+
+    
+         // 랜덤 색상 만들기 (RGB)
+         const colors = () =>{
+            const arrColor = [];
+            
+            for(let i = 0; i < 3; i++) {
+                const rgb = Math.floor(Math.random() * 256);
+                let hex = rgb.toString(16);
+
+                if(hex.length === 1) {
+                    hex = '0' + hex;
+                }
+
+                arrColor.push(hex);
+            }
+            // join(접착제) 함수를 쓰면  배열을 하나의 문자열로 접착제를 사용해서 붙임
+            // [1,2,3].join('#') >> 1#2#3
+            return '#'+ arrColor.join('');
+         }
+
+        
+         function makeBox() {
+            const box = document.createElement('div');
+                box.className = 'box';
+                box.style.backgroundColor = colors();
+                conatainer.append(box);
+         }
+
+         function deleteBox () {
+            if(conatainer.childElementCount > 0) {
+                conatainer.removeChild(conatainer.lastElementChild)
+            };
+         }
+
+
+
+
+
+    </script>
+</body>
+</html>
