@@ -59,6 +59,7 @@ Pencli `weather.pen`의 **Weather App** 컴포넌트 디자인 그대로 구현�
 
 ## 4. 기능 명세
 
+
 ### 검색
 - 도시명 입력 후 Search 버튼 또는 Enter 키로 검색
 - 초기 로드 시 `Seoul` 자동 검색

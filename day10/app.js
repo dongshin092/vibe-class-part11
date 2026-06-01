@@ -7,17 +7,15 @@ const searchBtn  = document.getElementById('search-btn');
 const errorMsg   = document.getElementById('error-msg');
 const datetimeEl = document.getElementById('datetime');
 
-// Update header clock every second
+// Header date — matches design: "Sunday, June 1, 2026"
 function updateClock() {
   const now = new Date();
-  datetimeEl.textContent = now.toLocaleString('ko-KR', {
-    year: 'numeric', month: '2-digit', day: '2-digit',
-    hour: '2-digit', minute: '2-digit', second: '2-digit',
-    hour12: false,
+  datetimeEl.textContent = now.toLocaleDateString('en-US', {
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
   });
 }
 updateClock();
-setInterval(updateClock, 1000);
+setInterval(updateClock, 60000);
 
 // Unix timestamp → "HH:MM" (local time via timezone offset)
 function unixToTime(unix, timezoneOffsetSec) {
@@ -65,32 +63,39 @@ async function fetchWeather(city) {
 }
 
 function renderWeather(d) {
-  const windKmh = (d.wind.speed * 3.6).toFixed(1);
-  const visKm   = (d.visibility / 1000).toFixed(1);
+  const windKmh = Math.round(d.wind.speed * 3.6);
+  const visKm   = (d.visibility / 1000).toFixed(0);
+  const feels   = Math.round(d.main.feels_like);
   const tz      = d.timezone;
 
-  // Hero
-  set('city-name',    d.name);
-  set('country-code', d.sys.country);
+  // Left weather block
+  set('city-name',    `${d.name}, ${d.sys.country}`);
   set('temp-main',    `${Math.round(d.main.temp)}°C`);
-  set('temp-high',    `최고 ${Math.round(d.main.temp_max)}°C`);
-  set('temp-low',     `최저 ${Math.round(d.main.temp_min)}°C`);
-  set('temp-feel',    `체감 ${Math.round(d.main.feels_like)}°C`);
   set('weather-desc', d.weather[0].description);
-  set('stat-humidity', `${d.main.humidity}%`);
-  set('stat-wind',    `${windKmh} km/h`);
-  set('stat-sunrise', unixToTime(d.sys.sunrise, tz));
-  set('stat-sunset',  unixToTime(d.sys.sunset, tz));
+  set('temp-high',    `H: ${Math.round(d.main.temp_max)}°C`);
+  set('temp-low',     `L: ${Math.round(d.main.temp_min)}°C`);
 
-  // Detail Grid
-  set('d-humidity',   d.main.humidity);
-  set('d-wind',       windKmh);
-  set('d-pressure',   d.main.pressure);
-  set('d-visibility', visKm);
-  set('d-feels',      Math.round(d.main.feels_like));
+  // Right stat rows
+  set('r-feels',      `${feels}°C`);
+  set('r-humidity',   `${d.main.humidity}%`);
+  set('r-wind',       `${windKmh} km/h`);
+  set('r-visibility', `${visKm} km`);
+
+  // Location row
+  set('loc-coords',   `${d.coord.lat.toFixed(2)}° N, ${d.coord.lon.toFixed(2)}° E`);
+  set('loc-sunrise',  `Sunrise ${unixToTime(d.sys.sunrise, tz)}`);
+  set('loc-sunset',   `Sunset ${unixToTime(d.sys.sunset, tz)}`);
+  set('loc-updated',  `Updated ${unixToTime(d.dt, tz)}`);
+
+  // Detail Grid (bento)
+  set('d-humidity',   `${d.main.humidity}%`);
+  set('d-wind',       `${windKmh} km/h`);
+  set('d-pressure',   `${d.main.pressure} hPa`);
+  set('d-visibility', `${visKm} km`);
+  set('d-feels',      `${feels}°C`);
   set('d-uv',         '—');   // Current Weather API에 UV 없음
-  set('d-clouds',     d.clouds.all);
-  set('d-dew',        dewpoint(d.main.temp, d.main.humidity));
+  set('d-clouds',     `${d.clouds.all}%`);
+  set('d-dew',        `${Math.round(dewpoint(d.main.temp, d.main.humidity))}°C`);
 }
 
 // Events
@@ -105,6 +110,9 @@ cityInput.addEventListener('keydown', (e) => {
     if (city) fetchWeather(city);
   }
 });
+
+// Render lucide icons
+if (window.lucide) lucide.createIcons();
 
 // Initial load
 fetchWeather('Seoul');

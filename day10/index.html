@@ -7,123 +7,180 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="app-wrapper">
-    <!-- Header -->
-    <header class="header">
-      <div class="header-logo">
-        <span class="header-icon">🌤</span>
-        <span class="header-title">WeatherNow</span>
-      </div>
-      <div class="header-datetime" id="datetime"></div>
-    </header>
+  <div class="app-container">
 
-    <!-- Search -->
-    <section class="search-section">
-      <div class="search-box">
-        <input
-          type="text"
-          id="city-input"
-          class="search-input"
-          placeholder="도시명을 입력하세요..."
-          autocomplete="off"
-        />
-        <button id="search-btn" class="search-btn">Search</button>
-      </div>
-    </section>
+    <!-- ── Dark Top Section (Header + Search + Weather Display) ── -->
+    <section class="top-section">
 
-    <!-- Error -->
-    <div id="error-msg" class="error-msg hidden"></div>
-
-    <!-- Hero -->
-    <section class="hero" id="hero" aria-live="polite">
-      <div class="hero-top">
-        <div class="hero-location">
-          <span id="city-name" class="city-name">—</span>
-          <span id="country-code" class="country-code"></span>
+      <!-- Header -->
+      <div class="header">
+        <div class="header-logo">
+          <i data-lucide="cloud-sun" class="logo-icon"></i>
+          <span class="header-title">WeatherNow</span>
         </div>
-        <div class="hero-main">
-          <span id="temp-main" class="temp-main">—</span>
-          <div class="temp-meta">
-            <span id="temp-high" class="temp-meta-item">최고 —</span>
-            <span id="temp-low" class="temp-meta-item">최저 —</span>
-            <span id="temp-feel" class="temp-meta-item">체감 —</span>
+        <div class="header-date" id="datetime"></div>
+      </div>
+
+      <!-- Search -->
+      <div class="search-wrap">
+        <p class="search-hint">Search any city for real-time weather</p>
+        <div class="search-bar">
+          <input
+            type="text"
+            id="city-input"
+            class="search-input"
+            placeholder="Enter city name..."
+            autocomplete="off"
+          />
+          <button id="search-btn" class="search-btn">
+            <i data-lucide="search" class="btn-icon"></i>
+            <span>Search</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Error -->
+      <div id="error-msg" class="error-msg hidden"></div>
+
+      <!-- Weather Display: Left + Right -->
+      <div class="weather-display" id="weather-display" aria-live="polite">
+        <!-- Left: big temp -->
+        <div class="weather-left">
+          <div id="city-name" class="city-name">—</div>
+          <div id="temp-main" class="temp-main">—</div>
+          <div id="weather-desc" class="weather-desc">—</div>
+          <div class="temp-range">
+            <span id="temp-high" class="temp-high">H: —</span>
+            <span id="temp-low" class="temp-low">L: —</span>
           </div>
         </div>
-        <div id="weather-desc" class="weather-desc">—</div>
+
+        <!-- Divider -->
+        <div class="weather-divider"></div>
+
+        <!-- Right: stat rows -->
+        <div class="weather-right">
+          <div class="stat-row">
+            <i data-lucide="thermometer" class="stat-icon"></i>
+            <span class="stat-label">Feels Like</span>
+            <span id="r-feels" class="stat-value">—</span>
+          </div>
+          <div class="stat-row">
+            <i data-lucide="droplets" class="stat-icon"></i>
+            <span class="stat-label">Humidity</span>
+            <span id="r-humidity" class="stat-value">—</span>
+          </div>
+          <div class="stat-row">
+            <i data-lucide="wind" class="stat-icon"></i>
+            <span class="stat-label">Wind</span>
+            <span id="r-wind" class="stat-value">—</span>
+          </div>
+          <div class="stat-row">
+            <i data-lucide="eye" class="stat-icon"></i>
+            <span class="stat-label">Visibility</span>
+            <span id="r-visibility" class="stat-value">—</span>
+          </div>
+        </div>
       </div>
-      <div class="hero-stats">
-        <div class="stat-item">
-          <span class="stat-icon">💧</span>
-          <span id="stat-humidity" class="stat-value">—</span>
-          <span class="stat-label">습도</span>
+
+      <!-- Location Row -->
+      <div class="location-row">
+        <div class="loc-item">
+          <i data-lucide="map-pin" class="loc-icon"></i>
+          <span id="loc-coords" class="loc-text">—</span>
         </div>
-        <div class="stat-item">
-          <span class="stat-icon">💨</span>
-          <span id="stat-wind" class="stat-value">—</span>
-          <span class="stat-label">풍속</span>
+        <div class="loc-item">
+          <i data-lucide="sunrise" class="loc-icon"></i>
+          <span id="loc-sunrise" class="loc-text">Sunrise —</span>
         </div>
-        <div class="stat-item">
-          <span class="stat-icon">🌅</span>
-          <span id="stat-sunrise" class="stat-value">—</span>
-          <span class="stat-label">일출</span>
+        <div class="loc-item">
+          <i data-lucide="sunset" class="loc-icon"></i>
+          <span id="loc-sunset" class="loc-text">Sunset —</span>
         </div>
-        <div class="stat-item">
-          <span class="stat-icon">🌇</span>
-          <span id="stat-sunset" class="stat-value">—</span>
-          <span class="stat-label">일몰</span>
+        <div class="loc-item">
+          <i data-lucide="clock-3" class="loc-icon"></i>
+          <span id="loc-updated" class="loc-text">Updated —</span>
         </div>
+      </div>
+
+    </section>
+
+    <!-- ── Light Bottom Section (Detail Cards) ── -->
+    <section class="detail-section">
+      <h2 class="detail-heading">WEATHER DETAILS</h2>
+      <div class="detail-grid">
+
+        <div class="detail-card">
+          <div class="card-header">
+            <span class="card-label">Humidity</span>
+            <i data-lucide="droplets" class="card-icon"></i>
+          </div>
+          <div id="d-humidity" class="card-value">—</div>
+        </div>
+
+        <div class="detail-card">
+          <div class="card-header">
+            <span class="card-label">Wind Speed</span>
+            <i data-lucide="wind" class="card-icon"></i>
+          </div>
+          <div id="d-wind" class="card-value">—</div>
+        </div>
+
+        <div class="detail-card">
+          <div class="card-header">
+            <span class="card-label">Pressure</span>
+            <i data-lucide="gauge" class="card-icon"></i>
+          </div>
+          <div id="d-pressure" class="card-value">—</div>
+        </div>
+
+        <div class="detail-card">
+          <div class="card-header">
+            <span class="card-label">Visibility</span>
+            <i data-lucide="eye" class="card-icon"></i>
+          </div>
+          <div id="d-visibility" class="card-value">—</div>
+        </div>
+
+        <div class="detail-card">
+          <div class="card-header">
+            <span class="card-label">Feels Like</span>
+            <i data-lucide="thermometer" class="card-icon"></i>
+          </div>
+          <div id="d-feels" class="card-value">—</div>
+        </div>
+
+        <div class="detail-card">
+          <div class="card-header">
+            <span class="card-label">UV Index</span>
+            <i data-lucide="sun" class="card-icon"></i>
+          </div>
+          <div id="d-uv" class="card-value">—</div>
+        </div>
+
+        <div class="detail-card">
+          <div class="card-header">
+            <span class="card-label">Cloudiness</span>
+            <i data-lucide="cloud" class="card-icon"></i>
+          </div>
+          <div id="d-clouds" class="card-value">—</div>
+        </div>
+
+        <div class="detail-card">
+          <div class="card-header">
+            <span class="card-label">Dew Point</span>
+            <i data-lucide="droplet" class="card-icon"></i>
+          </div>
+          <div id="d-dew" class="card-value">—</div>
+        </div>
+
       </div>
     </section>
 
-    <!-- Detail Grid -->
-    <section class="detail-section">
-      <h2 class="detail-heading">WEATHER DETAIL</h2>
-      <div class="detail-grid">
-        <div class="detail-card">
-          <div class="detail-label">습도</div>
-          <div id="d-humidity" class="detail-value">—</div>
-          <div class="detail-unit">%</div>
-        </div>
-        <div class="detail-card">
-          <div class="detail-label">풍속</div>
-          <div id="d-wind" class="detail-value">—</div>
-          <div class="detail-unit">km/h</div>
-        </div>
-        <div class="detail-card">
-          <div class="detail-label">기압</div>
-          <div id="d-pressure" class="detail-value">—</div>
-          <div class="detail-unit">hPa</div>
-        </div>
-        <div class="detail-card">
-          <div class="detail-label">가시거리</div>
-          <div id="d-visibility" class="detail-value">—</div>
-          <div class="detail-unit">km</div>
-        </div>
-        <div class="detail-card">
-          <div class="detail-label">체감온도</div>
-          <div id="d-feels" class="detail-value">—</div>
-          <div class="detail-unit">°C</div>
-        </div>
-        <div class="detail-card">
-          <div class="detail-label">UV 지수</div>
-          <div id="d-uv" class="detail-value">—</div>
-          <div class="detail-unit"></div>
-        </div>
-        <div class="detail-card">
-          <div class="detail-label">운량</div>
-          <div id="d-clouds" class="detail-value">—</div>
-          <div class="detail-unit">%</div>
-        </div>
-        <div class="detail-card">
-          <div class="detail-label">이슬점</div>
-          <div id="d-dew" class="detail-value">—</div>
-          <div class="detail-unit">°C</div>
-        </div>
-      </div>
-    </section>
   </div>
 
   <script src="app.js"></script>
