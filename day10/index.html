@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WeatherNow</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-wrapper">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-logo">
+        <span class="header-icon">🌤</span>
+        <span class="header-title">WeatherNow</span>
+      </div>
+      <div class="header-datetime" id="datetime"></div>
+    </header>
+
+    <!-- Search -->
+    <section class="search-section">
+      <div class="search-box">
+        <input
+          type="text"
+          id="city-input"
+          class="search-input"
+          placeholder="도시명을 입력하세요..."
+          autocomplete="off"
+        />
+        <button id="search-btn" class="search-btn">Search</button>
+      </div>
+    </section>
+
+    <!-- Error -->
+    <div id="error-msg" class="error-msg hidden"></div>
+
+    <!-- Hero -->
+    <section class="hero" id="hero" aria-live="polite">
+      <div class="hero-top">
+        <div class="hero-location">
+          <span id="city-name" class="city-name">—</span>
+          <span id="country-code" class="country-code"></span>
+        </div>
+        <div class="hero-main">
+          <span id="temp-main" class="temp-main">—</span>
+          <div class="temp-meta">
+            <span id="temp-high" class="temp-meta-item">최고 —</span>
+            <span id="temp-low" class="temp-meta-item">최저 —</span>
+            <span id="temp-feel" class="temp-meta-item">체감 —</span>
+          </div>
+        </div>
+        <div id="weather-desc" class="weather-desc">—</div>
+      </div>
+      <div class="hero-stats">
+        <div class="stat-item">
+          <span class="stat-icon">💧</span>
+          <span id="stat-humidity" class="stat-value">—</span>
+          <span class="stat-label">습도</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon">💨</span>
+          <span id="stat-wind" class="stat-value">—</span>
+          <span class="stat-label">풍속</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon">🌅</span>
+          <span id="stat-sunrise" class="stat-value">—</span>
+          <span class="stat-label">일출</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon">🌇</span>
+          <span id="stat-sunset" class="stat-value">—</span>
+          <span class="stat-label">일몰</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Detail Grid -->
+    <section class="detail-section">
+      <h2 class="detail-heading">WEATHER DETAIL</h2>
+      <div class="detail-grid">
+        <div class="detail-card">
+          <div class="detail-label">습도</div>
+          <div id="d-humidity" class="detail-value">—</div>
+          <div class="detail-unit">%</div>
+        </div>
+        <div class="detail-card">
+          <div class="detail-label">풍속</div>
+          <div id="d-wind" class="detail-value">—</div>
+          <div class="detail-unit">km/h</div>
+        </div>
+        <div class="detail-card">
+          <div class="detail-label">기압</div>
+          <div id="d-pressure" class="detail-value">—</div>
+          <div class="detail-unit">hPa</div>
+        </div>
+        <div class="detail-card">
+          <div class="detail-label">가시거리</div>
+          <div id="d-visibility" class="detail-value">—</div>
+          <div class="detail-unit">km</div>
+        </div>
+        <div class="detail-card">
+          <div class="detail-label">체감온도</div>
+          <div id="d-feels" class="detail-value">—</div>
+          <div class="detail-unit">°C</div>
+        </div>
+        <div class="detail-card">
+          <div class="detail-label">UV 지수</div>
+          <div id="d-uv" class="detail-value">—</div>
+          <div class="detail-unit"></div>
+        </div>
+        <div class="detail-card">
+          <div class="detail-label">운량</div>
+          <div id="d-clouds" class="detail-value">—</div>
+          <div class="detail-unit">%</div>
+        </div>
+        <div class="detail-card">
+          <div class="detail-label">이슬점</div>
+          <div id="d-dew" class="detail-value">—</div>
+          <div class="detail-unit">°C</div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
